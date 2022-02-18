@@ -12,6 +12,43 @@
     <script src="index.js" defer></script>
 </head>
 <body>
-  <canvas id="glcanvas" width="640" height="480"></canvas>
+  <div class="header">
+    <h1>K2-13 Grafika Komputer</h1>
+    <h2>2D Web Based CAD</h2>
+  </div>
+  <div class="content">
+    <div class="menubar">
+      <select name="metode" id="metode">
+        <option value="garis">Garis</option>
+        <option value="garis">Persegi</option>
+        <option value="garis">Persegi Panjang</option>
+        <option value="garis">Poligon</option>
+      </select>
+      <button><a>Download</a></button>
+      <!-- Trigger/Open The Modal -->
+      <button id="myBtn">Bantuan</button>
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h1>Bantuan</h1>
+          <p>1. Terdapat 4 pilihan metode</p>
+          <ul>
+            <li>Garis</li>
+            <li>Persegi</li>
+            <li>Persegi Panjang</li>
+            <li>Poligon</li>
+          </ul>
+          <p>2. Anda bisa mendownload hasil kreativitas Anda</p>
+        </div>
+
+      </div>
+    </div>
+    <div class="canvas">
+      <canvas id="glcanvas" width="640" height="480"></canvas>
+    </div>
+  </div>
 </body>
 </html>
