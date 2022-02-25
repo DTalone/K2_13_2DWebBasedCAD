@@ -1,3 +1,6 @@
+body{
+  background-color: antiquewhite;
+}
 .header {
     text-align: center;
 }
@@ -48,4 +51,14 @@
 .menubar {
     display: flex;
     justify-content: space-between;
+}
+
+#polygon-div{
+  margin: 10px 0 10px 0;
+  display: flex;
+  justify-content: center;
+}
+
+#glcanvas{
+  background-color: white;
 }

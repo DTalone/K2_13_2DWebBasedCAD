@@ -10,6 +10,7 @@
             crossorigin="anonymous" defer></script>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script src="index.js" defer></script>
+    <script src="polygon.js"></script>
 </head>
 <body>
   <div class="header">
@@ -22,7 +23,6 @@
         <option value="garis">Garis</option>
         <option value="garis">Persegi</option>
         <option value="garis">Persegi Panjang</option>
-        <option value="garis">Poligon</option>
       </select>
       <button><a>Download</a></button>
       <!-- Trigger/Open The Modal -->
@@ -47,7 +47,12 @@
       </div>
     </div>
     <div class="canvas">
-      <canvas id="glcanvas" width="640" height="480"></canvas>
+      <canvas id="glcanvas" width="640" height="480" ></canvas>
+    </div>
+    <div id="polygon-div">
+      <button id="polygon-btn" >Create polygon</button>
+      <input id="titikPolygon" placeholder="Banyak titik" onsubmit="console.log(3)"></input>
+      <input id="panjangPolygon" placeholder="Panjang" onsubmit="console.log(3)"></input>
     </div>
   </div>
 </body>

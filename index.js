@@ -56,36 +56,56 @@ function main() {
 
   // Fragment shader program
 
+  // GANTI WARNA DISINI
   const fsSource = `
     void main() {
-      gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+      gl_FragColor = vec4(1.0, 0, 1.0, 1.0);
     }
   `;
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
-  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+  const shadeProgram = initShaderProgram(gl, vsSource, fsSource);
 
-  // Collect all the info needed to use the shader program.
-  // Look up which attribute our shader program is using
-  // for aVertexPosition and look up uniform locations.
-  const programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-    },
-    uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-    },
-  };
+  document.getElementById('titikPolygon').addEventListener("change", function(event) {
+        console.log(event.target.value)
+        side = event.target.value;
+  })
+  
+  document.getElementById('panjangPolygon').addEventListener("change", function(event) {
+      console.log(event.target.value)
+      length = event.target.value;
+  })
 
-  // Here's where we call the routine that builds all the
-  // objects we'll be drawing.
-  const buffers = initBuffers(gl);
+  document.getElementById('polygon-btn').addEventListener("click", ()=>{
+    createPolygon(shadeProgram)
+    // polygon(false,true)
+  })
 
-  // Draw the scene
-  drawScene(gl, programInfo, buffers);
+
+
+  // ----------------------------------------------------template-------------------------------------------------------
+  // // Collect all the info needed to use the shader program.
+  // // Look up which attribute our shader program is using
+  // // for aVertexPosition and look up uniform locations.
+  // const programInfo = {
+  //   program: shaderProgram,
+  //   attribLocations: {
+  //     vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
+  //   },
+  //   uniformLocations: {
+  //     projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
+  //     modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+  //   },
+  // };
+
+  // // Here's where we call the routine that builds all the
+  // // objects we'll be drawing.
+  // const buffers = initBuffers(gl);
+
+  // // Draw the scene
+  // drawScene(gl, programInfo, buffers);
+  // ----------------------------------------------------template-------------------------------------------------------
 }
 
 //
