@@ -40,9 +40,16 @@ function render() {
   var primitiveType = gl.TRIANGLES;
   var offset = 0;
   points.forEach(shape => {
-    var count = shape.length/2
+    var count = 6
     console.log(shape)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shape), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      shape[0],shape[1],
+      shape[2],shape[1],
+      shape[0],shape[3],
+      shape[0],shape[3],
+      shape[2],shape[1],
+      shape[2],shape[3]
+    ]), gl.STATIC_DRAW);
     gl.uniform4f(colorUniformLocation, 1, 0, 0.5, 1); // War
     gl.drawArrays(primitiveType, offset, count);
   });
@@ -115,7 +122,7 @@ gl.drawArrays(primitiveType, offset, count);
 canvas.addEventListener("click", function(event){
   element.push(event.layerX);
   element.push(event.layerY);
-  if (element.length==6) {
+  if (element.length==4) {
     points.push(element)
     element = []
   }
