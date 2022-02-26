@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css" type="text/css">
     <script src="index.js" defer></script>
     <script src="modal.js" defer></script>
+    <script src="square.js" defer></script>
     <!-- vertex shader -->
     <script  id="vertex-shader-2d" type="notjs">
       attribute vec2 a_position;
@@ -35,7 +36,7 @@
       uniform vec4 u_color;
   
       void main() {
-        gl_FragColor = u_color; // return redish-purple
+        gl_FragColor = u_color;
       }
     </script>
 </head>
@@ -47,12 +48,19 @@
   <div class="content">
     <div class="menubar">
       <select name="metode" id="metode">
-        <option value="garis">Garis</option>
-        <option value="garis">Persegi</option>
-        <option value="garis">Persegi Panjang</option>
-        <option value="garis">Poligon</option>
+        <option value="0"></option>
+        <option value="1">Garis</option>
+        <option value="2">Persegi</option>
+        <option value="3">Persegi Panjang</option>
+        <option value="4">Poligon</option>
       </select>
-      <button><a>Download</a></button>
+      <div class="range">
+        <input type="range" name="panjang" id="panjang" value="1" min="1" max="500" oninput="this.nextElementSibling.value = this.value">
+        <output>1</output>
+      </div>
+      <input type="color" name="warna" id="warna">
+      <button><a>Unduh</a></button>
+      <button><a>Lanjutkan</a></button>
       <!-- Trigger/Open The Modal -->
       <button id="myBtn">Bantuan</button>
       <!-- The Modal -->

@@ -3,6 +3,7 @@ body {
 }
 .header {
     text-align: center;
+    line-height: 20px;
 }
 
 /* The Modal (background) */
@@ -51,4 +52,12 @@ body {
 .menubar {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.range {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
 }

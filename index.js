@@ -1,12 +1,21 @@
+// Konstanta
+const garis = 1;
+const persegi = 2;
+const persegipanjang = 3;
+const poligon = 4;
+
+// Inisialisasi canvas
 var canvas = document.querySelector("#glcanvas");
 var gl = canvas.getContext("webgl");
-var points = []
-var element = []
-
 if (!gl) {
- console.log("ERROR");
+  console.log("ERROR");
 }
 
+// Variabel global
+var elements = []
+var points = []
+
+// Fungsi umum
 function createShader(gl, type, source) {
   var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -39,25 +48,34 @@ function render() {
   // draw
   var primitiveType = gl.TRIANGLES;
   var offset = 0;
-  points.forEach(shape => {
-    var count = 6
-    console.log(shape)
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-      shape[0],shape[1],
-      shape[2],shape[1],
-      shape[0],shape[3],
-      shape[0],shape[3],
-      shape[2],shape[1],
-      shape[2],shape[3]
-    ]), gl.STATIC_DRAW);
-    gl.uniform4f(colorUniformLocation, 1, 0, 0.5, 1); // War
-    gl.drawArrays(primitiveType, offset, count);
+  elements.forEach(item => {
+    const type = item.type
+    const points = item.points
+    const color = item.color
+    console.log(elements)
+    if (type==persegi || type==persegipanjang){
+      drawQuad(gl, points, colorUniformLocation, color)
+    }
   });
 
   // requestAnimationFrame(render);
 
 }
 
+function hexToRGB(hex) {
+  return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+             ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1).match(/.{2}/g)
+    .map(x => parseInt(x, 16))
+}
+
+function getColor() {
+  const hex = document.getElementById("warna").value
+  const warna = hexToRGB(hex)
+  return [warna[0]/255,warna[1]/255,warna[2]/255,1]
+}
+
+// Program Utama
 var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
 var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
  
@@ -107,27 +125,56 @@ gl.vertexAttribPointer(
 // set the resolution
 gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
-gl.uniform4f(colorUniformLocation, 1, 1, 1, 1);
-
-// draw
-var primitiveType = gl.TRIANGLES;
-var offset = 0;
-var count = 6;
-gl.uniform4f(colorUniformLocation, 1, 0, 0.5, 1);
-gl.drawArrays(primitiveType, offset, count);
-
 
 
 
 canvas.addEventListener("click", function(event){
-  element.push(event.layerX);
-  element.push(event.layerY);
-  if (element.length==4) {
-    points.push(element)
-    element = []
+  points.push(event.layerX);
+  points.push(event.layerY);
+  console.log(getColor())
+  if (document.getElementById("metode").value==persegipanjang && points.length==4) {
+    elements.push({
+      type : persegipanjang,
+      points : [
+        points[0],points[1],
+        points[2],points[1],
+        points[0],points[3],
+        points[0],points[3],
+        points[2],points[1],
+        points[2],points[3]
+      ],
+      color : getColor()
+    })
+    render()
+    points = []
+    document.getElementById("metode").value="0"
   }
-  if (points.length>0) {
-    console.log("tis")
+  else if (document.getElementById("metode").value==persegi && points.length==2){
+    const length=parseInt(document.getElementById("panjang").value)
+    console.log(length)
+    elements.push({
+      type : persegi,
+      source : points,
+      length : length,
+      points : [
+        points[0]-length,points[1]-length,
+        points[0]+length,points[1]-length,
+        points[0]-length,points[1]+length,
+        points[0]-length,points[1]+length,
+        points[0]+length,points[1]-length,
+        points[0]+length,points[1]+length
+      ],
+      color : getColor()
+    })
+    render()
+    points = []
+    document.getElementById("metode").value="0"
+  }
+  else if (document.getElementById("metode").value=="0"){
+    points = []
+  }
+
+  if (elements.length>0) {
     render();
   }
 });
