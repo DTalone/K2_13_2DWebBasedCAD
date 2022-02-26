@@ -43,16 +43,17 @@ function createProgram(gl, vertexShader, fragmentShader) {
   gl.deleteProgram(program);
 }
 
-function render() {
+function render(arrObjects = null) {
   console.log("Clidked!")
+
+  if (arrObjects) {
+    elements = arrObjects;
+  }
   // draw
-  var primitiveType = gl.TRIANGLES;
-  var offset = 0;
   elements.forEach(item => {
     const type = item.type
     const points = item.points
     const color = item.color
-    console.log(elements)
     if (type==persegi || type==persegipanjang){
       drawQuad(gl, points, colorUniformLocation, color)
     }
@@ -73,6 +74,17 @@ function getColor() {
   const hex = document.getElementById("warna").value
   const warna = hexToRGB(hex)
   return [warna[0]/255,warna[1]/255,warna[2]/255,1]
+}
+
+function unduh() {
+  exportFile(elements);
+}
+
+function lanjutkan() {
+  elements = importFile(document.getElementById("lanjutkanFile").files[0])
+  // Clear the canvas
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
 // Program Utama
@@ -151,7 +163,6 @@ canvas.addEventListener("click", function(event){
   }
   else if (document.getElementById("metode").value==persegi && points.length==2){
     const length=parseInt(document.getElementById("panjang").value)
-    console.log(length)
     elements.push({
       type : persegi,
       source : points,

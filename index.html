@@ -9,6 +9,7 @@
     <script src="index.js" defer></script>
     <script src="modal.js" defer></script>
     <script src="square.js" defer></script>
+    <script src="file.js" defer></script>
     <!-- vertex shader -->
     <script  id="vertex-shader-2d" type="notjs">
       attribute vec2 a_position;
@@ -86,8 +87,10 @@
       <canvas id="glcanvas" width="640" height="480" style="border:1px dashed black;"></canvas>
     </div>
     <div class="file">
-      <button><a>Unduh</a></button>
-      <button><a>Lanjutkan</a></button>
+      <input type="text" placeholder="Nama File" name="namaFile" id="namaFile">
+      <button onclick="unduh()">Unduh</button>
+      <input type="file" id="lanjutkanFile" name="lanjutkanFile" accept="json">
+      <button onclick="lanjutkan()">Lanjutkan</button>
     </div>
   </div>
 </body>
