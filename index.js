@@ -138,6 +138,7 @@ function edit() {
     var te = document.createTextNode("Simpan")
     el.setAttribute("id", "simpan")
     el.appendChild(te);
+    tmp = JSON.parse(JSON.stringify(elements));
     el.addEventListener("click", ()=> {
       // Fungsi save
       el.remove()
@@ -157,9 +158,7 @@ function edit() {
   }
 }
 
-function editRender(edEl, cuPo) {
-  tmp = JSON.parse(JSON.stringify(elements));
-  
+function editRender(edEl, cuPo) {  
   edEl.forEach(item=> {
     tmp[item.idxEl].points[item.idxPo]=cuPo[0]
     tmp[item.idxEl].points[item.idxPo+1]=cuPo[1]
@@ -315,7 +314,7 @@ canvas.addEventListener("click", function(event){
 
 canvas.addEventListener("mousedown", function(event){
   isClicking=true;
-  editElements=[]
+  editElements=[];
   if (isEdit && isClicking) {
     elements.forEach((item,index1) => {
       item.points.forEach((_, index2) => {
