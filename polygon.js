@@ -30,3 +30,13 @@ function drawPolygon(gl, points, colorUniformLocation, color){
     gl.uniform4f(colorUniformLocation, color[0], color[1], color[2], color[3]);
     gl.drawArrays(gl.TRIANGLE_FAN, 0,  points.length/2);
 }
+
+function editPolygon(id, color) {
+    tmp.forEach(item=> {
+        if (item.id==id) {
+            item.color = getColor(item.id)
+        }
+    })
+
+    editRender()    
+}

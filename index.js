@@ -16,6 +16,10 @@ var elements = []
 var tmp = []
 var points = []
 var editElements = []
+var idxPP = 0
+var idxPe = 0
+var idxG = 0
+var idxPo= 0
 var panjang = document.getElementById("panjangContainer");panjang.style.display = "none";
 var titik = document.getElementById("titik");titik.style.display = "none";
 var warna = document.getElementById("warna");warna.style.display = "none";
@@ -83,8 +87,8 @@ function hexToRGB(hex) {
     .map(x => parseInt(x, 16))
 }
 
-function getColor() {
-  const hex = document.getElementById("warna").value
+function getColor(id="warna") {
+  const hex = document.getElementById(id).value
   const warna = hexToRGB(hex)
   return [warna[0]/255,warna[1]/255,warna[2]/255,1]
 }
@@ -132,8 +136,10 @@ function resetButtonMenubar(){
 
 function edit() {
   var button = document.getElementById("editBtn");
+  var menuBar = document.getElementById("menubar")
   isEdit = !isEdit;
   if (isEdit) {
+    // buat tombol simpan
     var el = document.createElement("button")
     var te = document.createTextNode("Simpan")
     el.setAttribute("id", "simpan")
@@ -145,9 +151,94 @@ function edit() {
       button.innerHTML = "Ubah"
       isEdit = !isEdit
       elements = JSON.parse(JSON.stringify(tmp));
+      document.getElementById("editbar").remove()
     })
     button.innerHTML = "Gagalkan Perubahan"
     button.parentNode.insertBefore(el, button.nextSibling);
+
+    // buat tombol tiap bangun
+    // 1. Persegi input:range sisi
+    // 2. Garis input:range garis
+    // 3, Poligon input:color 
+    var children =document.createElement("div")
+    children.setAttribute("id", "editbar")
+    menuBar.parentNode.insertBefore(children, menuBar.nextSibling);
+    elements.forEach((item,index)=> {
+      if (item.type==garis) {
+        var label = document.createElement("label");
+        label.htmlFor = item.id;
+        label.innerHTML=item.id;
+
+        var newInput = document.createElement("input");
+        newInput.id = item.id
+        newInput.name = item.id
+        newInput.type = "range"
+        var distance = euclideanDistance(item.points[0],item.points[1], item.points[2], item.points[3])
+        newInput.setAttribute("min", 1)
+        newInput.setAttribute("max", 800)
+        newInput.setAttribute("value", distance)
+        newInput.setAttribute("oninput", `{
+          this.nextElementSibling.value = this.value;
+          editLine(this.id, this.value);
+          }`
+        )
+
+        var newOutput = document.createElement("output");
+        newOutput.innerHTML = distance
+
+        children.appendChild(label)
+        children.appendChild(newInput)
+        children.appendChild(newOutput)
+        children.appendChild(document.createElement("br"))
+      }
+      else if (item.type==persegi) {
+        var label = document.createElement("label");
+        label.htmlFor = item.id;
+        label.innerHTML=item.id;
+
+        var newInput = document.createElement("input");
+        newInput.id = item.id
+        newInput.name = item.id
+        newInput.type = "range"
+        console.log(item)
+        var length = item.length
+        newInput.setAttribute("min", 1)
+        newInput.setAttribute("max", 800)
+        newInput.setAttribute("value", length)
+        newInput.setAttribute("oninput", `{
+          this.nextElementSibling.value = this.value;
+          editSquare(this.id, this.value);
+          }`
+        )
+        var newOutput = document.createElement("output");
+        newOutput.innerHTML = length
+
+        children.appendChild(label)
+        children.appendChild(newInput)
+        children.appendChild(newOutput)
+        children.appendChild(document.createElement("br"))
+      }
+      else if (item.type==poligon) {
+        var label = document.createElement("label");
+        label.htmlFor = item.id;
+        label.innerHTML=item.id;
+
+        var newInput = document.createElement("input");
+        newInput.id = item.id
+        newInput.name = item.id
+        newInput.type = "color"
+        var length = item.length
+
+        children.appendChild(label)
+        children.appendChild(newInput)
+        children.appendChild(document.createElement("br"))
+        newInput.setAttribute("oninput", `{
+          this.nextElementSibling.value = this.value;
+          editPolygon(this.id, this.value);
+          }`
+        )
+      }
+    })
   }
   else {
     document.getElementById("editBtn").innerHTML = "Ubah"
@@ -155,14 +246,20 @@ function edit() {
     console.log(elements)
     render()
     document.getElementById("simpan")?.remove()
+    document.getElementById("editbar").remove()
   }
 }
 
-function editRender(edEl, cuPo) {  
-  edEl.forEach(item=> {
-    tmp[item.idxEl].points[item.idxPo]=cuPo[0]
-    tmp[item.idxEl].points[item.idxPo+1]=cuPo[1]
-  })
+function editRender(edEl=null, cuPo=null) { 
+  if (edEl==null) {
+    // do nothing
+  }
+  else {
+    edEl.forEach(item=> {
+      tmp[item.idxEl].points[item.idxPo]=cuPo[0]
+      tmp[item.idxEl].points[item.idxPo+1]=cuPo[1]
+    })
+  }
 
   tmp.forEach(item => {
     const type = item.type
@@ -178,6 +275,17 @@ function editRender(edEl, cuPo) {
       drawPolygon(gl, points, colorUniformLocation, color)
     }
   });
+}
+
+function editLine(id, val) {
+  tmp.forEach(item=> {
+    if (item.id==id) {
+      var distance = euclideanDistance(item.points[0], item.points[1], item.points[2], item.points[3])
+      if (item.points[0]>item.points[1]) {
+        
+      }
+    }
+  })
 }
 
 // Program Utama
@@ -238,7 +346,9 @@ canvas.addEventListener("click", function(event){
     points.push(event.layerX);
     points.push(event.layerY);
     if (document.getElementById("metode").value==persegipanjang && points.length==4) {
+      idxPP+=1
       elements.push({
+        id : "persegipanjang_"+idxPP,
         type : persegipanjang,
         points : [
           points[0],points[1],
@@ -256,7 +366,9 @@ canvas.addEventListener("click", function(event){
     }
     else if (document.getElementById("metode").value==persegi && points.length==2){
       const length=parseInt(document.getElementById("panjang").value)
+      idxPe +=1
       elements.push({
+        id : "persegi_"+idxPe,
         type : persegi,
         source : points,
         length : length,
@@ -277,7 +389,9 @@ canvas.addEventListener("click", function(event){
     else if (document.getElementById("metode").value==poligon && points.length==2){
       const titik=parseInt(document.getElementById("titik").value)
       const length=parseInt(document.getElementById("panjang").value)
+      idxPo +=1
       elements.push({
+        id : "poligon_"+idxPo,
         type : poligon,
         source : points,
         length : length,
@@ -290,7 +404,9 @@ canvas.addEventListener("click", function(event){
     }
     
     else if (document.getElementById("metode").value==garis && points.length==4) {
+      idxG +=1
       elements.push({
+        id : "garis_"+idxG,
         type : garis,
         source : points,
         length : length,
