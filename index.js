@@ -50,14 +50,16 @@ function render(arrObjects = null) {
     elements = arrObjects;
   }
   // draw
-  elements.forEach(item => {
-    const type = item.type
-    const points = item.points
-    const color = item.color
-    if (type==persegi || type==persegipanjang){
-      drawQuad(gl, points, colorUniformLocation, color)
-    }
-  });
+  if (elements.length>0) {
+    elements.forEach(item => {
+      const type = item.type
+      const points = item.points
+      const color = item.color
+      if (type==persegi || type==persegipanjang){
+        drawQuad(gl, points, colorUniformLocation, color)
+      }
+    });
+  }
 
   // requestAnimationFrame(render);
 
@@ -143,7 +145,8 @@ gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 canvas.addEventListener("click", function(event){
   points.push(event.layerX);
   points.push(event.layerY);
-  console.log(getColor())
+  console.log("Click")
+  console.log(points)
   if (document.getElementById("metode").value==persegipanjang && points.length==4) {
     elements.push({
       type : persegipanjang,
