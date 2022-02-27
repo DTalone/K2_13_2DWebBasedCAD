@@ -75,9 +75,6 @@ function render(arrObjects = null) {
       drawPolygon(gl, points, colorUniformLocation, color)
     }
   });
-
-  // requestAnimationFrame(render);
-
 }
 
 function hexToRGB(hex) {
@@ -85,6 +82,15 @@ function hexToRGB(hex) {
              ,(m, r, g, b) => '#' + r + r + g + g + b + b)
     .substring(1).match(/.{2}/g)
     .map(x => parseInt(x, 16))
+}
+
+function componentToHex(c) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + componentToHex(r*255) + componentToHex(g*255) + componentToHex(b*255);
 }
 
 function getColor(id="warna") {
@@ -165,78 +171,13 @@ function edit() {
     menuBar.parentNode.insertBefore(children, menuBar.nextSibling);
     elements.forEach((item,index)=> {
       if (item.type==garis) {
-        var label = document.createElement("label");
-        label.htmlFor = item.id;
-        label.innerHTML=item.id;
-
-        var newInput = document.createElement("input");
-        newInput.id = item.id
-        newInput.name = item.id
-        newInput.type = "range"
-        var distance = euclideanDistance(item.points[0],item.points[1], item.points[2], item.points[3])
-        newInput.setAttribute("min", 1)
-        newInput.setAttribute("max", 800)
-        newInput.setAttribute("value", distance)
-        newInput.setAttribute("oninput", `{
-          this.nextElementSibling.value = this.value;
-          editLine(this.id, this.value);
-          }`
-        )
-
-        var newOutput = document.createElement("output");
-        newOutput.innerHTML = distance
-
-        children.appendChild(label)
-        children.appendChild(newInput)
-        children.appendChild(newOutput)
-        children.appendChild(document.createElement("br"))
+        addEditLineBar(item, children)
       }
       else if (item.type==persegi) {
-        var label = document.createElement("label");
-        label.htmlFor = item.id;
-        label.innerHTML=item.id;
-
-        var newInput = document.createElement("input");
-        newInput.id = item.id
-        newInput.name = item.id
-        newInput.type = "range"
-        console.log(item)
-        var length = item.length
-        newInput.setAttribute("min", 1)
-        newInput.setAttribute("max", 800)
-        newInput.setAttribute("value", length)
-        newInput.setAttribute("oninput", `{
-          this.nextElementSibling.value = this.value;
-          editSquare(this.id, this.value);
-          }`
-        )
-        var newOutput = document.createElement("output");
-        newOutput.innerHTML = length
-
-        children.appendChild(label)
-        children.appendChild(newInput)
-        children.appendChild(newOutput)
-        children.appendChild(document.createElement("br"))
+        addEditSquareBar(item, children)
       }
       else if (item.type==poligon) {
-        var label = document.createElement("label");
-        label.htmlFor = item.id;
-        label.innerHTML=item.id;
-
-        var newInput = document.createElement("input");
-        newInput.id = item.id
-        newInput.name = item.id
-        newInput.type = "color"
-        var length = item.length
-
-        children.appendChild(label)
-        children.appendChild(newInput)
-        children.appendChild(document.createElement("br"))
-        newInput.setAttribute("oninput", `{
-          this.nextElementSibling.value = this.value;
-          editPolygon(this.id, this.value);
-          }`
-        )
+        addEditPolygonBar(item, children)
       }
     })
   }
@@ -275,17 +216,6 @@ function editRender(edEl=null, cuPo=null) {
       drawPolygon(gl, points, colorUniformLocation, color)
     }
   });
-}
-
-function editLine(id, val) {
-  tmp.forEach(item=> {
-    if (item.id==id) {
-      var distance = euclideanDistance(item.points[0], item.points[1], item.points[2], item.points[3])
-      if (item.points[0]>item.points[1]) {
-        
-      }
-    }
-  })
 }
 
 // Program Utama
