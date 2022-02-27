@@ -13,11 +13,14 @@ if (!gl) {
 
 // Variabel global
 var elements = []
+var tmp = []
 var points = []
+var editElements = []
 var panjang = document.getElementById("panjangContainer");panjang.style.display = "none";
 var titik = document.getElementById("titik");titik.style.display = "none";
 var warna = document.getElementById("warna");warna.style.display = "none";
 var isEdit = false;
+var isClicking = false;
 
 // Fungsi umum
 function createShader(gl, type, source) {
@@ -48,7 +51,7 @@ function createProgram(gl, vertexShader, fragmentShader) {
 }
 
 function render(arrObjects = null) {
-  console.log("Clidked!")
+  console.log("Clicked!")
 
   if (arrObjects) {
     elements = arrObjects;
@@ -136,15 +139,40 @@ function edit() {
       // Fungsi save
       el.remove()
       button.innerHTML = "Ubah"
-      isEdit = !isEdit;
+      isEdit = !isEdit
+      elements = tmp
     })
     button.innerHTML = "Gagalkan Perubahan"
     button.parentNode.insertBefore(el, button.nextSibling);
   }
   else {
     document.getElementById("editBtn").innerHTML = "Ubah"
+    console.log("TES")
+    console.log(elements)
+    render()
     document.getElementById("simpan")?.remove()
   }
+}
+
+function editRender(edEl, cuPo) {
+  tmp = JSON.parse(JSON.stringify(elements));
+  
+  edEl.forEach(item=> {
+    tmp[item.idxEl].points[item.idxPo]=cuPo[0]
+    tmp[item.idxEl].points[item.idxPo+1]=cuPo[1]
+  })
+
+  tmp.forEach(item => {
+    const type = item.type
+    const points = item.points
+    const color = item.color
+    if (type==persegi || type==persegipanjang){
+      drawQuad(gl, points, colorUniformLocation, color)
+    }
+    else if (type==garis){
+      drawLine(gl, points, colorUniformLocation, color)
+    }
+  });
 }
 
 // Program Utama
@@ -204,8 +232,6 @@ canvas.addEventListener("click", function(event){
   if (!isEdit) {
     points.push(event.layerX);
     points.push(event.layerY);
-    console.log("Click")
-    console.log(points)
     if (document.getElementById("metode").value==persegipanjang && points.length==4) {
       elements.push({
         type : persegipanjang,
@@ -266,7 +292,35 @@ canvas.addEventListener("click", function(event){
       render();
     }
   }
-  else {
+});
 
+canvas.addEventListener("mousedown", function(event){
+  isClicking=true;
+  editElements=[]
+  if (isEdit && isClicking) {
+    elements.forEach((item,index1) => {
+      item.points.forEach((_, index2) => {
+        if (index2%2!==1) {
+          var distance = euclideanDistance(event.layerX, event.layerY, item.points[index2], item.points[index2+1])
+          if (distance<=5.0) {
+            editElements.push({
+                idxEl : index1,
+                idxPo : index2
+              }
+            )
+          }
+        }
+      })
+    })
   }
+});
+
+canvas.addEventListener("mousemove", function(event){
+  if (isEdit && isClicking) {
+    editRender(editElements, [event.layerX,event.layerY])
+  }
+});
+
+canvas.addEventListener("mouseup", function(event){
+  isClicking=false;
 });
