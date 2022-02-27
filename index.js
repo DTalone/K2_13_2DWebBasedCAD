@@ -14,6 +14,9 @@ if (!gl) {
 // Variabel global
 var elements = []
 var points = []
+var panjang = document.getElementById("panjangContainer");panjang.style.display = "none";
+var titik = document.getElementById("titik");titik.style.display = "none";
+var warna = document.getElementById("warna");warna.style.display = "none";
 
 // Fungsi umum
 function createShader(gl, type, source) {
@@ -89,6 +92,36 @@ function lanjutkan() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
+function select(){
+  const metode = document.getElementById('metode').value
+
+  if (metode==persegi) {
+    panjang.style.display = "block";
+    titik.style.display = "none";
+    warna.style.display = "block";
+  }
+  else if (metode==persegipanjang || metode==garis) {
+    panjang.style.display = "none";
+    titik.style.display = "none";
+    warna.style.display = "block";
+  }
+  else if (metode==poligon) {
+    panjang.style.display = "none";
+    titik.style.display = "block";
+    warna.style.display = "block";
+  }
+  else {
+    resetButtonMenubar()
+  }
+}
+
+function resetButtonMenubar(){
+  document.getElementById("metode").value="0"
+  panjang.style.display = "none";
+  titik.style.display = "none";
+  warna.style.display = "none";
+}
+
 // Program Utama
 var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
 var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
@@ -162,7 +195,7 @@ canvas.addEventListener("click", function(event){
     })
     render()
     points = []
-    document.getElementById("metode").value="0"
+    resetButtonMenubar()
   }
   else if (document.getElementById("metode").value==persegi && points.length==2){
     const length=parseInt(document.getElementById("panjang").value)
@@ -182,7 +215,7 @@ canvas.addEventListener("click", function(event){
     })
     render()
     points = []
-    document.getElementById("metode").value="0"
+    resetButtonMenubar()
   }
   else if (document.getElementById("metode").value=="0"){
     points = []

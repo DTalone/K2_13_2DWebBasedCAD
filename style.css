@@ -57,7 +57,7 @@ body {
     margin-bottom: 5px;
 }
 
-.range {
+#panjangContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;

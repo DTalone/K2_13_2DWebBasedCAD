@@ -48,14 +48,14 @@
   </div>
   <div class="content">
     <div class="menubar">
-      <select name="metode" id="metode">
+      <select name="metode" id="metode" onchange="select()">
         <option value="0"></option>
         <option value="1">Garis</option>
         <option value="2">Persegi</option>
         <option value="3">Persegi Panjang</option>
         <option value="4">Poligon</option>
       </select>
-      <div class="range">
+      <div class="range" id="panjangContainer">
         <label for="panjang">Panjang</label>
         <input type="range" name="panjang" id="panjang" value="1" min="1" max="500" oninput="this.nextElementSibling.value = this.value">
         <output>1</output>
