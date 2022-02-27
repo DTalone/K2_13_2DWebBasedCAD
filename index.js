@@ -140,7 +140,7 @@ function edit() {
       el.remove()
       button.innerHTML = "Ubah"
       isEdit = !isEdit
-      elements = tmp
+      elements = JSON.parse(JSON.stringify(tmp));
     })
     button.innerHTML = "Gagalkan Perubahan"
     button.parentNode.insertBefore(el, button.nextSibling);
