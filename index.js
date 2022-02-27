@@ -174,6 +174,9 @@ function editRender(edEl, cuPo) {
     else if (type==garis){
       drawLine(gl, points, colorUniformLocation, color)
     }
+    else if (type==poligon){
+      drawPolygon(gl, points, colorUniformLocation, color)
+    }
   });
 }
 
@@ -267,7 +270,6 @@ canvas.addEventListener("click", function(event){
         ],
         color : getColor()
       })
-      console.log(points);
       render()
       points = []
       resetButtonMenubar()
@@ -300,10 +302,11 @@ canvas.addEventListener("click", function(event){
       })
       render()
       points = []
-      document.getElementById("metode").value="0"
+      resetButtonMenubar()
     }
     else if (document.getElementById("metode").value=="0"){
       points = []
+      resetButtonMenubar()
     }
   
     if (elements.length>0) {
