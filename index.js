@@ -1,289 +1,291 @@
-main();
+// Konstanta
+const garis = 1;
+const persegi = 2;
+const persegipanjang = 3;
+const poligon = 4;
 
-// Get the modal
-var modal = document.getElementById("myModal");
-
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-  modal.style.display = "block";
+// Inisialisasi canvas
+var canvas = document.querySelector("#glcanvas");
+var gl = canvas.getContext("webgl");
+if (!gl) {
+  console.log("ERROR");
 }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
+// Variabel global
+var elements = []
+var points = []
+var panjang = document.getElementById("panjangContainer");panjang.style.display = "none";
+var titik = document.getElementById("titik");titik.style.display = "none";
+var warna = document.getElementById("warna");warna.style.display = "none";
+var isEdit = false;
 
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
-
-
-//
-// Start here
-//
-function main() {
-  const canvas = document.querySelector('#glcanvas');
-  const gl = canvas.getContext('webgl');
-
-  // If we don't have a GL context, give up now
-
-  if (!gl) {
-    alert('Unable to initialize WebGL. Your browser or machine may not support it.');
-    return;
-  }
-
-  // Vertex shader program
-
-  const vsSource = `
-    attribute vec4 aVertexPosition;
-
-    uniform mat4 uModelViewMatrix;
-    uniform mat4 uProjectionMatrix;
-
-    void main() {
-      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-    }
-  `;
-
-  // Fragment shader program
-
-  // GANTI WARNA DISINI
-  const fsSource = `
-    precision mediump float;
-    uniform vec4 u_fragColor;
-    void main() {
-      gl_FragColor = u_fragColor;
-    }
-  `;
-
-  // Initialize a shader program; this is where all the lighting
-  // for the vertices and so forth is established.
-  const shadeProgram = initShaderProgram(gl, vsSource, fsSource);
-
-  document.getElementById('titikPolygon').addEventListener("change", function(event) {
-        console.log(event.target.value)
-        side = event.target.value;
-  })
-  
-  document.getElementById('panjangPolygon').addEventListener("change", function(event) {
-      console.log(event.target.value)
-      length = event.target.value;
-  })
-
-  document.getElementById('polygon-btn').addEventListener("click", ()=>{
-    createPolygon(shadeProgram)
-    // polygon(false,true)
-  })
-
-  colorPick = document.getElementById('colorPicker');  
-  colorPick.addEventListener("change", changeColor, false);
-
-
-  // ----------------------------------------------------template-------------------------------------------------------
-  // // Collect all the info needed to use the shader program.
-  // // Look up which attribute our shader program is using
-  // // for aVertexPosition and look up uniform locations.
-  // const programInfo = {
-  //   program: shaderProgram,
-  //   attribLocations: {
-  //     vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-  //   },
-  //   uniformLocations: {
-  //     projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-  //     modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
-  //   },
-  // };
-
-  // // Here's where we call the routine that builds all the
-  // // objects we'll be drawing.
-  // const buffers = initBuffers(gl);
-
-  // // Draw the scene
-  // drawScene(gl, programInfo, buffers);
-  // ----------------------------------------------------template-------------------------------------------------------
-}
-
-//
-// initBuffers
-//
-// Initialize the buffers we'll need. For this demo, we just
-// have one object -- a simple two-dimensional square.
-//
-function initBuffers(gl) {
-
-  // Create a buffer for the square's positions.
-
-  const positionBuffer = gl.createBuffer();
-
-  // Select the positionBuffer as the one to apply buffer
-  // operations to from here out.
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-  // Now create an array of positions for the square.
-
-  const positions = [
-     1.0,  1.0,
-    -1.0,  1.0,
-     1.0, -1.0,
-    -1.0, -1.0,
-  ];
-
-  // Now pass the list of positions into WebGL to build the
-  // shape. We do this by creating a Float32Array from the
-  // JavaScript array, then use it to fill the current buffer.
-
-  gl.bufferData(gl.ARRAY_BUFFER,
-                new Float32Array(positions),
-                gl.STATIC_DRAW);
-
-  return {
-    position: positionBuffer,
-  };
-}
-
-//
-// Draw the scene.
-//
-function drawScene(gl, programInfo, buffers) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-  gl.clearDepth(1.0);                 // Clear everything
-  gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-  gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
-
-  // Clear the canvas before we start drawing on it.
-
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-  // Create a perspective matrix, a special matrix that is
-  // used to simulate the distortion of perspective in a camera.
-  // Our field of view is 45 degrees, with a width/height
-  // ratio that matches the display size of the canvas
-  // and we only want to see objects between 0.1 units
-  // and 100 units away from the camera.
-
-  const fieldOfView = 45 * Math.PI / 180;   // in radians
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 0.1;
-  const zFar = 100.0;
-  const projectionMatrix = mat4.create();
-
-  // note: glmatrix.js always has the first argument
-  // as the destination to receive the result.
-  mat4.perspective(projectionMatrix,
-                   fieldOfView,
-                   aspect,
-                   zNear,
-                   zFar);
-
-  // Set the drawing position to the "identity" point, which is
-  // the center of the scene.
-  const modelViewMatrix = mat4.create();
-
-  // Now move the drawing position a bit to where we want to
-  // start drawing the square.
-
-  mat4.translate(modelViewMatrix,     // destination matrix
-                 modelViewMatrix,     // matrix to translate
-                 [-0.0, 0.0, -6.0]);  // amount to translate
-
-  // Tell WebGL how to pull out the positions from the position
-  // buffer into the vertexPosition attribute.
-  {
-    const numComponents = 2;
-    const type = gl.FLOAT;
-    const normalize = false;
-    const stride = 0;
-    const offset = 0;
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-    gl.vertexAttribPointer(
-        programInfo.attribLocations.vertexPosition,
-        numComponents,
-        type,
-        normalize,
-        stride,
-        offset);
-    gl.enableVertexAttribArray(
-        programInfo.attribLocations.vertexPosition);
-  }
-
-  // Tell WebGL to use our program when drawing
-
-  gl.useProgram(programInfo.program);
-
-  // Set the shader uniforms
-
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.projectionMatrix,
-      false,
-      projectionMatrix);
-  gl.uniformMatrix4fv(
-      programInfo.uniformLocations.modelViewMatrix,
-      false,
-      modelViewMatrix);
-
-  {
-    const offset = 0;
-    const vertexCount = 4;
-    gl.drawArrays(gl.TRIANGLE_STRIP, offset, vertexCount);
-  }
-}
-
-//
-// Initialize a shader program, so WebGL knows how to draw our data
-//
-function initShaderProgram(gl, vsSource, fsSource) {
-  const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-  const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-
-  // Create the shader program
-
-  const shaderProgram = gl.createProgram();
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  gl.linkProgram(shaderProgram);
-
-  // If creating the shader program failed, alert
-
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
-    return null;
-  }
-
-  return shaderProgram;
-}
-
-//
-// creates a shader of the given type, uploads the source and
-// compiles it.
-//
-function loadShader(gl, type, source) {
-  const shader = gl.createShader(type);
-
-  // Send the source to the shader object
-
+// Fungsi umum
+function createShader(gl, type, source) {
+  var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
-
-  // Compile the shader program
-
   gl.compileShader(shader);
-
-  // See if it compiled successfully
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
+  var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+  if (success) {
+    return shader;
   }
-
-  return shader;
+ 
+  console.log(gl.getShaderInfoLog(shader));
+  gl.deleteShader(shader);
 }
+
+function createProgram(gl, vertexShader, fragmentShader) {
+  var program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+  if (success) {
+    return program;
+  }
+ 
+  console.log(gl.getProgramInfoLog(program));
+  gl.deleteProgram(program);
+}
+
+function render(arrObjects = null) {
+  console.log("Clidked!")
+
+  if (arrObjects) {
+    elements = arrObjects;
+  }
+  // draw
+  elements.forEach(item => {
+    const type = item.type
+    const points = item.points
+    const color = item.color
+    if (type==persegi || type==persegipanjang){
+      drawQuad(gl, points, colorUniformLocation, color)
+    }
+    else if (type==garis){
+      drawLine(gl, points, colorUniformLocation, color)
+    }
+    else if (type==poligon){
+      drawPolygon(gl, points, colorUniformLocation, color)
+    }
+  });
+
+  // requestAnimationFrame(render);
+
+}
+
+function hexToRGB(hex) {
+  return hex.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+             ,(m, r, g, b) => '#' + r + r + g + g + b + b)
+    .substring(1).match(/.{2}/g)
+    .map(x => parseInt(x, 16))
+}
+
+function getColor() {
+  const hex = document.getElementById("warna").value
+  const warna = hexToRGB(hex)
+  return [warna[0]/255,warna[1]/255,warna[2]/255,1]
+}
+
+function unduh() {
+  exportFile(elements);
+}
+
+function lanjutkan() {
+  elements = importFile(document.getElementById("lanjutkanFile").files[0])
+  // Clear the canvas
+  gl.clearColor(0, 0, 0, 0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+}
+
+function select(){
+  const metode = document.getElementById('metode').value
+
+  if (metode==persegi) {
+    panjang.style.display = "block";
+    titik.style.display = "none";
+    warna.style.display = "block";
+  }
+  else if (metode==persegipanjang || metode==garis) {
+    panjang.style.display = "none";
+    titik.style.display = "none";
+    warna.style.display = "block";
+  }
+  else if (metode==poligon) {
+    panjang.style.display = "block";
+    titik.style.display = "block";
+    warna.style.display = "block";
+  }
+  else {
+    resetButtonMenubar()
+  }
+}
+
+function resetButtonMenubar(){
+  document.getElementById("metode").value="0"
+  panjang.style.display = "none";
+  titik.style.display = "none";
+  warna.style.display = "none";
+}
+
+function edit() {
+  var button = document.getElementById("editBtn");
+  isEdit = !isEdit;
+  if (isEdit) {
+    var el = document.createElement("button")
+    var te = document.createTextNode("Simpan")
+    el.setAttribute("id", "simpan")
+    el.appendChild(te);
+    el.addEventListener("click", ()=> {
+      // Fungsi save
+      el.remove()
+      button.innerHTML = "Ubah"
+      isEdit = !isEdit;
+    })
+    button.innerHTML = "Gagalkan Perubahan"
+    button.parentNode.insertBefore(el, button.nextSibling);
+  }
+  else {
+    document.getElementById("editBtn").innerHTML = "Ubah"
+    document.getElementById("simpan")?.remove()
+  }
+}
+
+// Program Utama
+var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
+var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
+ 
+var vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+var fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+
+var program = createProgram(gl, vertexShader, fragmentShader);
+// look up where the vertex data needs to go.
+var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
+
+// look up uniform locations
+var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+
+var colorUniformLocation = gl.getUniformLocation(program, "u_color");
+
+// Create a buffer to put three 2d clip space points in
+var positionBuffer = gl.createBuffer();
+
+// Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+// Tell WebGL how to convert from clip space to pixels
+gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+// Clear the canvas
+gl.clearColor(0, 0, 0, 0);
+gl.clear(gl.COLOR_BUFFER_BIT);
+
+// Tell it to use our program (pair of shaders)
+gl.useProgram(program);
+
+// Turn on the attribute
+gl.enableVertexAttribArray(positionAttributeLocation);
+
+// Bind the position buffer.
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+// Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+var size = 2;          // 2 components per iteration
+var type = gl.FLOAT;   // the data is 32bit floats
+var normalize = false; // don't normalize the data
+var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+var offset = 0;        // start at the beginning of the buffer
+gl.vertexAttribPointer(
+    positionAttributeLocation, size, type, normalize, stride, offset);
+
+// set the resolution
+gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+
+
+
+
+canvas.addEventListener("click", function(event){
+  if (!isEdit) {
+    points.push(event.layerX);
+    points.push(event.layerY);
+    console.log("Click")
+    console.log(points)
+    if (document.getElementById("metode").value==persegipanjang && points.length==4) {
+      elements.push({
+        type : persegipanjang,
+        points : [
+          points[0],points[1],
+          points[2],points[1],
+          points[0],points[3],
+          points[0],points[3],
+          points[2],points[1],
+          points[2],points[3]
+        ],
+        color : getColor()
+      })
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    else if (document.getElementById("metode").value==persegi && points.length==2){
+      const length=parseInt(document.getElementById("panjang").value)
+      elements.push({
+        type : persegi,
+        source : points,
+        length : length,
+        points : [
+          points[0]-length,points[1]-length,
+          points[0]+length,points[1]-length,
+          points[0]-length,points[1]+length,
+          points[0]-length,points[1]+length,
+          points[0]+length,points[1]-length,
+          points[0]+length,points[1]+length
+        ],
+        color : getColor()
+      })
+      console.log(points);
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    else if (document.getElementById("metode").value==poligon && points.length==2){
+      const titik=parseInt(document.getElementById("titik").value)
+      const length=parseInt(document.getElementById("panjang").value)
+      elements.push({
+        type : poligon,
+        source : points,
+        length : length,
+        points : setupVert(titik,length,points),
+        color : getColor()
+      })
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    
+    else if (document.getElementById("metode").value==garis && points.length==4) {
+      elements.push({
+        type : garis,
+        source : points,
+        length : length,
+        points : [
+          points[0],points[1],
+          points[2],points[3],
+        ],
+        color : getColor()
+      })
+      render()
+      points = []
+      document.getElementById("metode").value="0"
+    }
+    else if (document.getElementById("metode").value=="0"){
+      points = []
+    }
+  
+    if (elements.length>0) {
+      render();
+    }
+  }
+  else {
+
+  }
+});

@@ -1,8 +1,12 @@
-body{
-  background-color: antiquewhite;
+body {
+  box-sizing: border-box;
+  background-color: bisque;
 }
 .header {
     text-align: center;
+    line-height: 10px;
+    margin-bottom: 40px;
+    margin-top: -10px;
 }
 
 /* The Modal (background) */
@@ -51,12 +55,26 @@ body{
 .menubar {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 5px;
 }
 
-#polygon-div{
-  margin: 10px 0 10px 0;
+#panjangContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  height: 10px;
+}
+
+.file {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+input,select,button {
+  height: 20px;
 }
 
 #glcanvas{

@@ -5,12 +5,43 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2D Web Based CAD</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"
-            integrity="sha512-zhHQR0/H5SEBL3Wn6yYSaTTZej12z0hVZKOv3TwCUXT1z5qeqGcXJLLrbERYRScEDDpYIJhPC1fk31gqR783iQ=="
-            crossorigin="anonymous" defer></script>
     <link rel="stylesheet" href="style.css" type="text/css">
     <script src="index.js" defer></script>
     <script src="polygon.js"></script>
+    <script src="modal.js" defer></script>
+    <script src="square.js" defer></script>
+    <script src="garis.js" defer></script>
+    <script src="file.js" defer></script>
+    <!-- vertex shader -->
+    <script  id="vertex-shader-2d" type="notjs">
+      attribute vec2 a_position;
+
+      uniform vec2 u_resolution;
+
+      void main() {
+        // convert the position from pixels to 0.0 to 1.0
+        vec2 zeroToOne = a_position / u_resolution;
+
+        // convert from 0->1 to 0->2
+        vec2 zeroToTwo = zeroToOne * 2.0;
+
+        // convert from 0->2 to -1->+1 (clipspace)
+        vec2 clipSpace = zeroToTwo - 1.0;
+
+        gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+      }
+    </script>
+    <!-- fragment shader -->
+    <script  id="fragment-shader-2d" type="notjs">
+      // fragment shaders don't have a default precision so we need
+      // to pick one. mediump is a good default
+      precision mediump float;
+      uniform vec4 u_color;
+  
+      void main() {
+        gl_FragColor = u_color;
+      }
+    </script>
 </head>
 <body>
   <div class="header">
@@ -19,13 +50,22 @@
   </div>
   <div class="content">
     <div class="menubar">
-      <select name="metode" id="metode">
-        <option value="garis">Garis</option>
-        <option value="garis">Persegi</option>
-        <option value="garis">Persegi Panjang</option>
+      <select name="metode" id="metode" onchange="select()">
+        <option value="0"></option>
+        <option value="1">Garis</option>
+        <option value="2">Persegi</option>
+        <option value="3">Persegi Panjang</option>
+        <option value="4">Poligon</option>
       </select>
-      <button><a>Download</a></button>
+      <div class="range" id="panjangContainer">
+        <label for="panjang">Panjang</label>
+        <input type="range" name="panjang" id="panjang" value="1" min="1" max="500" oninput="this.nextElementSibling.value = this.value">
+        <output>1</output>
+      </div>
+      <input type="number" name="titik" id="titik" placeholder="Titik" min="3" max="100"></input>
+      <input type="color" name="warna" id="warna">
       <!-- Trigger/Open The Modal -->
+      <button id="editBtn" onclick="edit()">Ubah</button>
       <button id="myBtn">Bantuan</button>
       <!-- The Modal -->
       <div id="myModal" class="modal">
@@ -49,11 +89,11 @@
     <div class="canvas">
       <canvas id="glcanvas" width="640" height="480" ></canvas>
     </div>
-    <div id="polygon-div">
-      <button id="polygon-btn" >Create polygon</button>
-      <input id="titikPolygon" placeholder="Banyak titik" onsubmit="console.log(3)"></input>
-      <input id="panjangPolygon" placeholder="Panjang" onsubmit="console.log(3)"></input>
-      <input type="color" id="colorPicker" value="#0000ff">
+    <div class="file">
+      <input type="text" placeholder="Nama File" name="namaFile" id="namaFile">
+      <button onclick="unduh()">Unduh</button>
+      <input type="file" id="lanjutkanFile" name="lanjutkanFile" accept="json">
+      <button onclick="lanjutkan()">Lanjutkan</button>
     </div>
   </div>
 </body>
