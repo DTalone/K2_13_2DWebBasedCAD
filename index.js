@@ -58,8 +58,10 @@ function main() {
 
   // GANTI WARNA DISINI
   const fsSource = `
+    precision mediump float;
+    uniform vec4 u_fragColor;
     void main() {
-      gl_FragColor = vec4(1.0, 0, 1.0, 1.0);
+      gl_FragColor = u_fragColor;
     }
   `;
 
@@ -82,6 +84,8 @@ function main() {
     // polygon(false,true)
   })
 
+  colorPick = document.getElementById('colorPicker');  
+  colorPick.addEventListener("change", changeColor, false);
 
 
   // ----------------------------------------------------template-------------------------------------------------------

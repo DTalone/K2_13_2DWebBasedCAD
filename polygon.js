@@ -1,4 +1,7 @@
 var positions = [];
+var rgbColor = {r: 0, g:0, b:1};
+var arrColor;
+
 
 function createPolygon(shadeProgram){
     canvas = document.getElementById('glcanvas')
@@ -7,6 +10,7 @@ function createPolygon(shadeProgram){
 
     gl.useProgram(shadeProgram)
 
+    arrColor = [rgbColor.r, rgbColor.g, rgbColor.b, 1];
     setupVert(side, length)
     console.log(positions)
 
@@ -47,9 +51,6 @@ function setupVert(side, length) {
     }
 }
 
-
-
-
 //Melakukan penggambaran
 function renderPolygon(shape, length, gl, shadeProgram){
     const projectionMatrix = mat4.create();   
@@ -62,5 +63,29 @@ function renderPolygon(shape, length, gl, shadeProgram){
         gl.getUniformLocation(shadeProgram, 'uModelViewMatrix'),
         false,
         modelViewMatrix);
-    gl.drawArrays(shape, 0, length);
+
+        var uniformCol = gl.getUniformLocation(shadeProgram, 'u_fragColor')
+        gl.uniform4fv(uniformCol, arrColor);
+
+        gl.drawArrays(shape, 0, length);
+}
+
+
+// converter hex to rgb
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+}
+//mengubah warna 
+function changeColor(event) {
+    hexColor = event.target.value;
+    rgbColor = hexToRgb(hexColor);
+
+    rgbColor.r = rgbColor.r / 255;
+    rgbColor.g = rgbColor.g / 255;
+    rgbColor.b = rgbColor.b / 255;
 }
