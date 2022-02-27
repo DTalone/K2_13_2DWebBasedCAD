@@ -17,6 +17,7 @@ var points = []
 var panjang = document.getElementById("panjangContainer");panjang.style.display = "none";
 var titik = document.getElementById("titik");titik.style.display = "none";
 var warna = document.getElementById("warna");warna.style.display = "none";
+var isEdit = false;
 
 // Fungsi umum
 function createShader(gl, type, source) {
@@ -123,6 +124,29 @@ function resetButtonMenubar(){
   warna.style.display = "none";
 }
 
+function edit() {
+  var button = document.getElementById("editBtn");
+  isEdit = !isEdit;
+  if (isEdit) {
+    var el = document.createElement("button")
+    var te = document.createTextNode("Simpan")
+    el.setAttribute("id", "simpan")
+    el.appendChild(te);
+    el.addEventListener("click", ()=> {
+      // Fungsi save
+      el.remove()
+      button.innerHTML = "Ubah"
+      isEdit = !isEdit;
+    })
+    button.innerHTML = "Gagalkan Perubahan"
+    button.parentNode.insertBefore(el, button.nextSibling);
+  }
+  else {
+    document.getElementById("editBtn").innerHTML = "Ubah"
+    document.getElementById("simpan")?.remove()
+  }
+}
+
 // Program Utama
 var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
 var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
@@ -177,67 +201,72 @@ gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
 
 canvas.addEventListener("click", function(event){
-  points.push(event.layerX);
-  points.push(event.layerY);
-  console.log("Click")
-  console.log(points)
-  if (document.getElementById("metode").value==persegipanjang && points.length==4) {
-    elements.push({
-      type : persegipanjang,
-      points : [
-        points[0],points[1],
-        points[2],points[1],
-        points[0],points[3],
-        points[0],points[3],
-        points[2],points[1],
-        points[2],points[3]
-      ],
-      color : getColor()
-    })
-    render()
-    points = []
-    resetButtonMenubar()
+  if (!isEdit) {
+    points.push(event.layerX);
+    points.push(event.layerY);
+    console.log("Click")
+    console.log(points)
+    if (document.getElementById("metode").value==persegipanjang && points.length==4) {
+      elements.push({
+        type : persegipanjang,
+        points : [
+          points[0],points[1],
+          points[2],points[1],
+          points[0],points[3],
+          points[0],points[3],
+          points[2],points[1],
+          points[2],points[3]
+        ],
+        color : getColor()
+      })
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    else if (document.getElementById("metode").value==persegi && points.length==2){
+      const length=parseInt(document.getElementById("panjang").value)
+      elements.push({
+        type : persegi,
+        source : points,
+        length : length,
+        points : [
+          points[0]-length,points[1]-length,
+          points[0]+length,points[1]-length,
+          points[0]-length,points[1]+length,
+          points[0]-length,points[1]+length,
+          points[0]+length,points[1]-length,
+          points[0]+length,points[1]+length
+        ],
+        color : getColor()
+      })
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    else if (document.getElementById("metode").value==garis && points.length==4) {
+      elements.push({
+        type : garis,
+        source : points,
+        length : length,
+        points : [
+          points[0],points[1],
+          points[2],points[3],
+        ],
+        color : getColor()
+      })
+      render()
+      points = []
+      document.getElementById("metode").value="0"
+    }
+    else if (document.getElementById("metode").value=="0"){
+      points = []
+    }
+  
+    if (elements.length>0) {
+      render();
+    }
   }
-  else if (document.getElementById("metode").value==persegi && points.length==2){
-    const length=parseInt(document.getElementById("panjang").value)
-    elements.push({
-      type : persegi,
-      source : points,
-      length : length,
-      points : [
-        points[0]-length,points[1]-length,
-        points[0]+length,points[1]-length,
-        points[0]-length,points[1]+length,
-        points[0]-length,points[1]+length,
-        points[0]+length,points[1]-length,
-        points[0]+length,points[1]+length
-      ],
-      color : getColor()
-    })
-    render()
-    points = []
-    resetButtonMenubar()
-  }
-  else if (document.getElementById("metode").value==garis && points.length==4) {
-    elements.push({
-      type : garis,
-      source : points,
-      length : length,
-      points : [
-        points[0],points[1],
-        points[2],points[3],
-      ],
-      color : getColor()
-    })
-    render()
-    points = []
-    document.getElementById("metode").value="0"
-  }
-  else if (document.getElementById("metode").value=="0"){
-    points = []
-  }
+  else {
 
-  if (elements.length>0) {
-    render();
   }
 });
