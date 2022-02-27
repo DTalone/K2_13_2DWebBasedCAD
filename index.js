@@ -63,6 +63,19 @@ function render(arrObjects = null) {
       }
     });
   }
+=======
+  elements.forEach(item => {
+    const type = item.type
+    const points = item.points
+    const color = item.color
+    if (type==persegi || type==persegipanjang){
+      drawQuad(gl, points, colorUniformLocation, color)
+    }
+    else if (type==garis){
+      drawLine(gl, points, colorUniformLocation, color)
+    }
+  });
+>>>>>>> Stashed changes
 
   // requestAnimationFrame(render);
 
@@ -216,6 +229,21 @@ canvas.addEventListener("click", function(event){
     render()
     points = []
     resetButtonMenubar()
+  }
+  else if (document.getElementById("metode").value==garis && points.length==4) {
+    elements.push({
+      type : garis,
+      source : points,
+      length : length,
+      points : [
+        points[0],points[1],
+        points[2],points[3],
+      ],
+      color : getColor()
+    })
+    render()
+    points = []
+    document.getElementById("metode").value="0"
   }
   else if (document.getElementById("metode").value=="0"){
     points = []
