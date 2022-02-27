@@ -53,17 +53,6 @@ function render(arrObjects = null) {
     elements = arrObjects;
   }
   // draw
-  if (elements.length>0) {
-    elements.forEach(item => {
-      const type = item.type
-      const points = item.points
-      const color = item.color
-      if (type==persegi || type==persegipanjang){
-        drawQuad(gl, points, colorUniformLocation, color)
-      }
-    });
-  }
-=======
   elements.forEach(item => {
     const type = item.type
     const points = item.points
@@ -75,7 +64,6 @@ function render(arrObjects = null) {
       drawLine(gl, points, colorUniformLocation, color)
     }
   });
->>>>>>> Stashed changes
 
   // requestAnimationFrame(render);
 
