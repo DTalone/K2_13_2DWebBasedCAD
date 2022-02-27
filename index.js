@@ -67,6 +67,9 @@ function render(arrObjects = null) {
     else if (type==garis){
       drawLine(gl, points, colorUniformLocation, color)
     }
+    else if (type==poligon){
+      drawPolygon(gl, points, colorUniformLocation, color)
+    }
   });
 
   // requestAnimationFrame(render);
@@ -111,7 +114,7 @@ function select(){
     warna.style.display = "block";
   }
   else if (metode==poligon) {
-    panjang.style.display = "none";
+    panjang.style.display = "block";
     titik.style.display = "block";
     warna.style.display = "block";
   }
@@ -265,10 +268,26 @@ canvas.addEventListener("click", function(event){
         ],
         color : getColor()
       })
+      console.log(points);
       render()
       points = []
       resetButtonMenubar()
     }
+    else if (document.getElementById("metode").value==poligon && points.length==2){
+      const titik=parseInt(document.getElementById("titik").value)
+      const length=parseInt(document.getElementById("panjang").value)
+      elements.push({
+        type : poligon,
+        source : points,
+        length : length,
+        points : setupVert(titik,length,points),
+        color : getColor()
+      })
+      render()
+      points = []
+      resetButtonMenubar()
+    }
+    
     else if (document.getElementById("metode").value==garis && points.length==4) {
       elements.push({
         type : garis,
