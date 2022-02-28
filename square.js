@@ -13,7 +13,6 @@ function addEditSquareBar(item, children) {
     newInput.id = item.id
     newInput.name = item.id
     newInput.type = "range"
-    console.log(item)
     var length = item.length
     newInput.setAttribute("min", 1)
     newInput.setAttribute("max", 800)

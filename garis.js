@@ -35,12 +35,64 @@ function addEditLineBar(item, children) {
 
 
 function editLine(id, val) {
+    val = parseFloat(val)
     tmp.forEach(item=> {
         if (item.id==id) {
-        var distance = euclideanDistance(item.points[0], item.points[1], item.points[2], item.points[3])
-        if (item.points[0]>item.points[1]) {
+            var distance = euclideanDistance(item.points[0], item.points[1], item.points[2], item.points[3])
+            var dx = Math.abs(item.points[0]-item.points[2])
+            var dy = Math.abs(item.points[1]-item.points[3])
+            var rad = Math.atan2(dy,dx)
             
-        }
+            var startX=0.0;
+            var startY=0.0;
+            var newX;
+            var newY;
+            if (item.points[0]>=item.points[2] && item.points[1]<item.points[3]) {
+                startX= item.points[2]
+                startY= item.points[3]
+                newX = Math.cos(-rad)*val+startX
+                newY = Math.sin(-rad)*val+startY
+
+                item.points = [
+                    startX, startY,
+                    newX, newY,
+                ]                
+            }
+            else if (item.points[0]>=item.points[2] && item.points[1]>=item.points[3]){
+                startX= item.points[2]
+                startY= item.points[3]
+                newX = Math.cos(rad)*val+startX
+                newY = Math.sin(rad)*val+startY
+                
+                item.points = [
+                    startX, startY,
+                    newX, newY,
+                ]
+            }
+            else if (item.points[0]<item.points[2] && item.points[1]>=item.points[3]){
+                startX= item.points[0]
+                startY= item.points[1]
+                newX = Math.cos(-rad)*val+startX
+                newY = Math.sin(-rad)*val+startY
+                item.points = [
+                    startX, startY,
+                    newX, newY,
+                ]
+            }
+            else if (item.points[0]<item.points[2] && item.points[1]<item.points[3]){
+                startX= item.points[0]
+                startY= item.points[1]
+                newX = Math.cos(rad)*val+startX
+                newY = Math.sin(rad)*val+startY
+                item.points = [
+                    startX, startY,
+                    newX, newY,
+                ]
+            }
+            
+
         }
     })
+
+    editRender()
 }

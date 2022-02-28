@@ -1,7 +1,6 @@
 // memasukkan banyak dan panjang ke dalam array 
 function setupVert(side, length, points) {
     positions = []
-    console.log('point 0:' , points[0]);
     positions.push(points[0]);
     positions.push(points[1]);
 

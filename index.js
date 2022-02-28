@@ -183,8 +183,6 @@ function edit() {
   }
   else {
     document.getElementById("editBtn").innerHTML = "Ubah"
-    console.log("TES")
-    console.log(elements)
     render()
     document.getElementById("simpan")?.remove()
     document.getElementById("editbar").remove()
